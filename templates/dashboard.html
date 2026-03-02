@@ -2,21 +2,62 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ريو بوت - لوحة التحكم</title>
     <style>
-        body { background: #23272a; color: white; font-family: sans-serif; padding: 20px; }
-        .guild-card { background: #2c2f33; padding: 15px; margin: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #444; }
-        .btn-manage { background: #43b581; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; }
+        body { background: #2f3136; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; text-align: center; }
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px; }
+        .guild-card { 
+            background: #36393f; 
+            width: 250px; 
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            border: 1px solid #444;
+        }
+        .guild-card:hover { transform: translateY(-5px); border-color: #5865f2; }
+        .guild-icon { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; background: #202225; }
+        .guild-name { font-weight: bold; font-size: 1.1em; display: block; margin-bottom: 15px; }
+        .btn-manage { 
+            background: #5865f2; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-size: 0.9em;
+            display: inline-block;
+        }
+        .btn-manage:hover { background: #4752c4; }
+        h1 { color: #fff; margin-bottom: 10px; }
+        p { color: #b9bbbe; }
     </style>
 </head>
 <body>
-    <h1>سيرفراتك التي تمتلك فيها صلاحيات الإدارة:</h1>
-    <hr>
-    {% for guild in guilds %}
-    <div class="guild-card">
-        <span>{{ guild.name }}</span>
-        <a href="/settings/{{ guild.id }}" class="btn-manage">إدارة السيرفر</a>
+    <h1>مرحباً بك في لوحة التحكم 👋</h1>
+    <p>اختر السيرفر الذي تود تعديل إعداداته</p>
+    <hr style="border: 0; height: 1px; background: #444; margin: 20px 100px;">
+
+    <div class="container">
+        {% for guild in guilds %}
+        <div class="guild-card">
+            {% if guild.icon %}
+                <img class="guild-icon" src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}.png" alt="{{ guild.name }}">
+            {% else %}
+                <div class="guild-icon" style="display: flex; align-items: center; justify-content: center; font-size: 2em;">{{ guild.name[0] }}</div>
+            {% endif %}
+            
+            <span class="guild-name">{{ guild.name }}</span>
+            <a href="/settings/{{ guild.id }}" class="btn-manage">إدارة السيرفر</a>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+
+    {% if not guilds %}
+    <div style="margin-top: 50px;">
+        <h3>لا توجد سيرفرات تملك فيها صلاحية الإدارة 🧐</h3>
+        <p>تأكد من أنك "Admin" في السيرفر الذي تبحث عنه.</p>
+    </div>
+    {% endif %}
 </body>
 </html>
