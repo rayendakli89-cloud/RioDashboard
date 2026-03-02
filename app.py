@@ -8,9 +8,10 @@ from motor.motor_asyncio import AsyncIOMotorClient
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-# --- [ الإعدادات - تقرأ من Render الآن ] ---
+# --- الإعدادات - تقرأ من Render ---
 CLIENT_ID = os.getenv("CLIENT_ID", "1453496208374108262")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+# تأكدنا من إضافة /callback هنا برمجياً لضمان التطابق
 REDIRECT_URI = os.getenv("REDIRECT_URI", "https://riodashboard.onrender.com/callback")
 MONGO_URL = os.getenv("MONGO_URL")
 
@@ -44,21 +45,29 @@ async def callback(request: Request, code: str):
             "code": code,
             "redirect_uri": REDIRECT_URI
         }
-        token_res = await http_client.post("https://discord.com/api/oauth2/token", data=token_data)
+        
+        # محاولة تبادل الكود بالتوكن
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        token_res = await http_client.post("https://discord.com/api/oauth2/token", data=token_data, headers=headers)
         token_json = token_res.json()
         access_token = token_json.get("access_token")
 
         if not access_token:
-            # سنطبع الخطأ في الـ Logs لنعرف السبب الحقيقي
-            print(f"Token Error: {token_json}")
-            return {"error": "فشل في الحصول على توكن الدخول", "details": token_json}
+            # هذا السطر سيظهر لك السبب الحقيقي للخطأ في المتصفح
+            return {
+                "error": "فشل في الحصول على توكن الدخول",
+                "reason_from_discord": token_json, 
+                "sent_redirect_uri": REDIRECT_URI
+            }
 
+        # جلب بيانات السيرفرات
         guilds_res = await http_client.get(
             "https://discord.com/api/users/@me/guilds",
             headers={"Authorization": f"Bearer {access_token}"}
         )
         guilds = guilds_res.json()
 
+        # تصفية السيرفرات (الأدمن فقط)
         admin_guilds = [
             g for g in guilds 
             if (int(g.get('permissions', 0)) & 0x8) == 0x8
