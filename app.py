@@ -11,7 +11,7 @@ templates = Jinja2Templates(directory="templates")
 CLIENT_ID = "1453496208374108262"
 CLIENT_SECRET = "DDf6GOxtdu_AOc5-FuZ8dJOWE19bO3F3"
 # هذا الرابط سنغيره لاحقاً بعد رفع الموقع على Render
-REDIRECT_URI = "http://localhost:8000/callback" 
+REDIRECT_URI = "https://riodashboard.onrender.com/callback" 
 
 # رابط المونجو الذي استخرجته مع وضع كلمة السر الصحيحة
 MONGO_URL = "mongodb+srv://rayendakli89_db_user:FSPThXDcqhw4X8ZS@cluster0.ineappi.mongodb.net/?appName=Cluster0"
@@ -85,5 +85,6 @@ async def settings(request: Request, guild_id: str):
     # إذا لم يكن للسيرفر إعدادات، نضع إعدادات افتراضية للعرض فقط
     if not config:
         config = {"prefix": "=", "language": "ar"}
+
 
     return f"<h1>إعدادات السيرفر {guild_id}</h1><p>البريفكس الحالي: {config.get('prefix')}</p><a href='/'>عودة</a>"
